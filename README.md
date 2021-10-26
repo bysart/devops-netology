@@ -1,24 +1,27 @@
 # devops-netology
-
+---
 First changes
+---
 
-# **/.terraform/* - игнорирование всего, что лежит в директории /.terraform/, которая может находится где угодно
+Задание - описание файла terraform ignore
 
-# *.tfstate - игнорирование файлов,которые заканчиваются на .tfstate
-# *.tfstate.* - игнорирование файлов,которые содержат .tfstate.
+**/.terraform/* - игнорирование всего, что лежит в директории /.terraform/, которая может находится где угодно
 
-# crash.log - игнорирование файла crash.log
+*.tfstate - игнорирование файлов,которые заканчиваются на .tfstate
+*.tfstate.* - игнорирование файлов,которые содержат .tfstate.
 
-# *.tfvars - игнорирование файлов,которые заканчиваются на *.tfvars
+crash.log - игнорирование файла crash.log
 
-# override.tf
-# override.tf.json
-# - игнорирование override.tf, override.tf.json
+*.tfvars - игнорирование файлов,которые заканчиваются на *.tfvars
 
-# *_override.tf
-# *_override.tf.json
-# - игнорирование файлов,которые заканчиваются на _override.tf, _override.tf.json
+override.tf
+override.tf.json
+игнорирование override.tf, override.tf.json
 
-# .terraformrc
-# terraform.rc
-# - игнорирование файлов .terraformrc, terraform.rc
+*_override.tf
+*_override.tf.json
+игнорирование файлов,которые заканчиваются на _override.tf, _override.tf.json
+
+.terraformrc
+terraform.rc
+игнорирование файлов .terraformrc, terraform.rc
