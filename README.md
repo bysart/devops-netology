@@ -4,7 +4,8 @@ First changes
 
 Задание - описание файла terraform ignore
 ---
-`**/.terraform/*      игнорирование всего, что лежит в директории /.terraform/, которая может находится где угодно
+```
+**/.terraform/*      игнорирование всего, что лежит в директории /.terraform/, которая может находится где угодно
 
 *.tfstate             игнорирование файлов,которые заканчиваются на .tfstate
 *.tfstate.*           игнорирование файлов,которые содержат .tfstate.
@@ -21,3 +22,4 @@ override.tf.json      игнорирование override.tf, override.tf.json
 
 .terraformrc
 terraform.rc          игнорирование файлов .terraformrc, terraform.rc
+```
