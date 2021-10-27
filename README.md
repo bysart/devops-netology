@@ -1,7 +1,5 @@
 # devops-netology
 
-First changes
-
 Задание - описание файла terraform ignore
 ---
 ```
