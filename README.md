@@ -22,3 +22,5 @@ override.tf.json      игнорирование override.tf, override.tf.json
 terraform.rc          игнорирование файлов .terraformrc, terraform.rc
 ```
 >wish to try some symbols `**dir/**`
+
+change one more time readme.md
