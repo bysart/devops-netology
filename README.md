@@ -1,26 +1,39 @@
-# devops-netology
+# DevOps-netology - training course for DevOps engineer
 
-Задание - описание файла terraform ignore
----
-```
-**/.terraform/*       игнорирование всего, что лежит в директории /.terraform/, которая может находится где угодно
+That is the public repo, but the main value - it's for me.
+If you are DevOps specialist, you won't find here usefull inforamtion.
 
-*.tfstate             игнорирование файлов,которые заканчиваются на .tfstate
-*.tfstate.*           игнорирование файлов,которые содержат .tfstate.
+I will write here some solved task. 
+That page will be used for a delivery some homework to big guys) and i'll take from that all knowladge that i can.
 
-crash.log             игнорирование файла crash.log
+Great tip:
+If you are intrested in workind overyour-self or wish to study, you can do the same as i:
+[Netology- digital edicution](https://netology.ru/)
 
-*.tfvars              игнорирование файлов,которые заканчиваются на *.tfvars
+
+##First task - add first line to README.MD
+ 
+First changes
+
+##Second task - add the explanations of the strings in the ignore file
+
+```**/.terraform/* - игнорирование всего, что лежит в директории /.terraform/, которая может находится где угодно
+
+*.tfstate - игнорирование файлов,которые заканчиваются на .tfstate
+*.tfstate.* - игнорирование файлов,которые содержат .tfstate.
+
+crash.log - игнорирование файла crash.log
+
+*.tfvars - игнорирование файлов,которые заканчиваются на *.tfvars
 
 override.tf
-override.tf.json      игнорирование override.tf, override.tf.json
+override.tf.json
+- игнорирование override.tf, override.tf.json
 
 *_override.tf
-*_override.tf.json    игнорирование файлов,которые заканчиваются на _override.tf, _override.tf.json
+*_override.tf.json
+- игнорирование файлов,которые заканчиваются на _override.tf, _override.tf.json
 
 .terraformrc
-terraform.rc          игнорирование файлов .terraformrc, terraform.rc
-```
->wish to try some symbols `**dir/**`
-
-change one more time readme.md
+terraform.rc
+- игнорирование файлов .terraformrc, terraform.rc```
