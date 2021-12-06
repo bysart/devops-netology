@@ -6,7 +6,99 @@
 Здесь будут опубликованы некоторые ДЗ по курсу.
 Github - простой и удобный способ доставки решения до преподавателя.
 
-## Задание - 3.7  Компьютерные сети
+## Задание - 3.8 Компьютерные сети
+
+> 1. Подключитесь к публичному маршрутизатору в интернет. Найдите маршрут к вашему публичному IP
+
+Ответ:
+`show ip route 95.161.ХХХ.ХХХ`
+```
+Routing entry for 95.161.240.0/20
+  Known via "bgp 6447", distance 20, metric 0
+  Tag 6939, type external
+  Last update from 64.71.137.241 1d17h ago
+  Routing Descriptor Blocks:
+  * 64.71.137.241, from 64.71.137.241, 1d17h ago
+      Route metric is 0, traffic share count is 1
+      AS Hops 2
+      Route tag 6939
+      MPLS label: none
+```
+
+> 2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
+
+Ответ:
+```
+cat /etc/network/interfaces
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+allow-hotplug enp0s3
+iface enp0s3 inet dhcp
+
+allow-hotplug enp0s8
+iface enp0s8 inet dhcp
+post-up ip route add 10.0.0.0/8 dev enp0s8
+
+allow-hotplug enp0s9
+iface enp0s9 inet dhcp
+post-up ip route add 191.168.56.0/24 dev dummy0
+
+auto dummy0
+iface dummy0 inet static
+address 10.0.0.1/32
+pre-up ip link add dummy0 type dummy
+post-down ip link del dummy0
+```
+```
+sovar@deb-v1:~$ ip -br route
+default via 10.0.3.2 dev enp0s8
+10.0.0.0/8 dev enp0s8 scope link
+10.0.3.0/24 dev enp0s8 proto kernel scope link src 10.0.3.15
+191.168.56.0/24 dev dummy0 scope link
+192.168.56.0/24 dev enp0s3 proto kernel scope link src 192.168.56.101
+192.168.56.0/24 dev enp0s9 proto kernel scope link src 192.168.56.102
+```
+
+> 3. Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.
+
+Ответ:
+Под рукой не оказалось Ubuntu, есть Debian, привожу выкладку с него.
+```
+sovar@deb-v1:~$ ss -ta
+State               Recv-Q              Send-Q                              Local Address:Port                             Peer Address:Port
+LISTEN              0                   128                                       0.0.0.0:ssh                                   0.0.0.0:*
+ESTAB               0                   64                                 192.168.56.101:ssh                              192.168.56.1:49862
+LISTEN              0                   128                                          [::]:ssh                                      [::]:*
+```
+
+> 4. Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?
+
+Ответ: 
+На текущий моменет в системе нет используемых UDP сокетов.
+```
+sovar@deb-v1:~$ ss -ua
+State               Recv-Q              Send-Q                             Local Address:Port                               Peer Address:Port
+UNCONN              0                   0                                        0.0.0.0:bootpc                                  0.0.0.0:*
+UNCONN              0                   0                                        0.0.0.0:bootpc                                  0.0.0.0:*
+UNCONN              0                   0                                        0.0.0.0:bootpc                                  0.0.0.0:*
+```
+
+
+> 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.
+
+Ответ:
+
+![img.png](screen/img_10.png)
+
+## Задание - 3.7 Компьютерные сети
 
 > 1. Проверьте список доступных сетевых интерфейсов на вашем компьютере. Какие команды есть для этого в Linux и в Windows?
 
