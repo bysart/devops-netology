@@ -6,8 +6,229 @@
 Здесь будут опубликованы некоторые ДЗ по курсу.
 Github - простой и удобный способ доставки решения до преподавателя.
 
-# Домашнее задание к занятию "4.3. Языки разметки JSON и YAML"
+## Курсовая работа "DevOps и системное администрирование"
 
+Задание:
+
+Результатом курсовой работы должны быть снимки экрана или текст:
+1. Процесс установки и настройки ufw
+2. Процесс установки и выпуска сертификата с помощью hashicorp vault 
+3. Процесс установки и настройки сервера nginx 
+4. Страница сервера nginx в браузере хоста не содержит предупреждений 
+5. Скрипт генерации нового сертификата работает (сертификат сервера ngnix должен быть "зеленым")
+6. Crontab работает (выберите число и время так, чтобы показать что crontab запускается и делает что надо)
+
+Решение:
+
+1. Процесс установки и настройки ufw
+```
+sudo apt install ufw
+```
+
+```
+sudo ufw default deny incoming
+Default incoming policy changed to 'deny'
+(be sure to update your rules accordingly)
+```
+
+```
+sudo ufw default allow outgoing
+Default outgoing policy changed to 'allow'
+(be sure to update your rules accordingly)
+``` 
+
+```
+sudo ufw enable 
+Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+Firewall is active and enabled on system startup
+```
+
+```
+sudo ufw allow 22
+```
+
+```
+sudo ufw allow 443
+```
+
+```
+sudo ufw logging on medium
+Logging enabled
+```
+
+```
+sudo ufw status verbose 
+[sudo] password for sovar: 
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22                         ALLOW IN    Anywhere                  
+443                        ALLOW IN    Anywhere                  
+22 (v6)                    ALLOW IN    Anywhere (v6)             
+443 (v6)                   ALLOW IN    Anywhere (v6)             
+```
+
+2. Процесс установки и выпуска сертификата с помощью hashicorp vault
+
+```
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+Warning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).
+OK
+```
+
+```
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+```
+
+```
+sudo apt-get update ; sudo apt-get install vault
+```
+
+![img.png](screen/img_19.png)
+
+```
+vault server -dev -dev-root-token-id root
+```
+
+```
+export VAULT_ADDR=http://127.0.0.1:8200
+```
+
+```
+export VAULT_TOKEN=root
+```
+
+```
+vault secrets enable pki
+```
+
+```
+vault secrets tune -max-lease-ttl=87600h pki
+```
+
+```
+vault write -field=certificate pki/root/generate/internal \
+common_name="DevOps Netology CA" \
+ttl=87600h > CA_cert.crt
+```
+
+```
+vault write pki/config/urls \
+issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
+crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
+```
+
+После, созданный сертификат добавляю в доверительные сертификаты на хостовых машинах.
+
+```
+vault write pki/roles/devops-netology-ca \
+allowed_domains="course-work.ru" \
+allow_bare_domains=true \
+max_ttl="8760h"
+Success! Data written to: pki/roles/devops-netology-ca
+```
+
+```
+vault write pki/issue/devops-netology-ca common_name="course-work.ru" ttl="720h"
+```
+
+![img.png](screen/img_20.png)
+
+3. Процесс установки и настройки сервера nginx
+
+```
+sudo apt install nginx
+```
+
+```
+systemctl status nginx.service 
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2021-12-23 15:39:12 MSK; 1min 16s ago
+       Docs: man:nginx(8)
+    Process: 7221 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 7222 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 7305 (nginx)
+      Tasks: 3 (limit: 4642)
+     Memory: 3.3M
+        CPU: 75ms
+     CGroup: /system.slice/nginx.service
+             ├─7305 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+             ├─7308 nginx: worker process
+             └─7309 nginx: worker process
+```
+
+```
+sudo nano /etc/hosts
+127.0.0.1	course-work.ru
+```
+
+```
+server {
+        listen 80 default_server;
+
+        # SSL configuration
+        listen 443 ssl;
+        ssl_certificate     /etc/nginx/cert/cert;
+        ssl_certificate_key /etc/nginx/cert/key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers         HIGH:!aNULL:!MD5;
+
+	server_name course-work.ru;
+```
+
+4. Страница сервера nginx в браузере хоста не содержит предупреждений
+
+![img.png](screen/img_21.png)
+
+5. Скрипт генерации нового сертификата работает (сертификат сервера ngnix должен быть "зеленым")
+
+```
+#!/usr/bin/bash
+
+/usr/bin/curl --header "X-Vault-Token: root" \
+    --request POST \
+    --data '{"common_name": "course-work.ru", "ttl": "720h"}' \
+    http://127.0.0.1:8200/v1/pki/issue/devops-netology-ca | jq >/home/sovar/gen-data.json
+
+/usr/bin/jq -r '.data.certificate' /home/sovar/gen-data.json >/home/sovar/cert2 
+/usr/bin/jq -r '.data.private_key' /home/sovar/gen-data.json >/home/sovar/key2
+
+/usr/bin/cp /home/sovar/cert2 /etc/nginx/cert/cert 
+/usr/bin/cp /home/sovar/key2 /etc/nginx/cert/key
+
+/usr/bin/systemctl restart nginx.service
+```
+
+6. Crontab работает (выберите число и время так, чтобы показать что crontab запускается и делает что надо)
+
+```
+sudo crontab -e
+```
+
+```
+*/1 * * * *  /home/sovar/update_cert.sh
+```
+
+Для простоты генерации события поставил вполнение каждую минуту, для выполнения требований курсовой работы необходимо указать:
+
+```
+* 23 28 * *  /home/sovar/update_cert.sh
+```
+
+Финальные скрины сертификата:
+
+![img.png](screen/img_22.png)
+
+![img.png](screen/img_23.png)
+
+![img.png](screen/img_24.png)
+
+## Домашнее задание к занятию "4.3. Языки разметки JSON и YAML"
 
 ## Обязательная задача 1
 Мы выгрузили JSON, который получили через API запрос к нашему сервису:
