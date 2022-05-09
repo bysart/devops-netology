@@ -6,6 +6,68 @@
 Здесь будут опубликованы некоторые ДЗ по курсу.
 Github - простой и удобный способ доставки решения до преподавателя.
 
+## Задание 09.02 CI\CD
+
+> 1. задание 1 - Знакомоство с SonarQube
+
+Ответ:
+
+![img.png](screen/img_32.png)
+
+> 2. задание 1 - Знакомоство с Nexus
+
+Ответ:
+```
+<metadata modelVersion="1.1.0">
+<groupId>netology</groupId>
+<artifactId>java</artifactId>
+<versioning>
+<latest>8_282</latest>
+<release>8_282</release>
+<versions>
+<version>8_102</version>
+<version>8_282</version>
+</versions>
+<lastUpdated>20220508211011</lastUpdated>
+</versioning>
+</metadata>
+```
+
+![img.png](screen/img_33.png)
+
+> 3. задание 1 - Знакомоство с Maven
+
+Ответ:
+
+```
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.netology.app</groupId>
+  <artifactId>simple-app</artifactId>
+  <version>1.0-SNAPSHOT</version>
+   <repositories>
+    <repository>
+      <id>my-repo</id>
+      <name>maven-public</name>
+      <url>http://localhost:8081/repository/maven-releases/</url>
+    </repository>
+  </repositories>
+  <dependencies>
+     <dependency>
+      <groupId>netology</groupId>
+      <artifactId>java</artifactId>
+      <version>8_282</version>
+      <classifier>distrib</classifier>
+      <type>tar.gz</type>
+    </dependency>
+  </dependencies>
+</project>
+```
+
+![img.png](screen/img_34.png)
+
 ## Задание 09.01. Жизненный цикл ПО
 > 1. Получить бесплатную JIRA.
 Настроить её для своей "команды разработки".
