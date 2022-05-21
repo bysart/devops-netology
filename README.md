@@ -6,6 +6,66 @@
 Здесь будут опубликованы некоторые ДЗ по курсу.
 Github - простой и удобный способ доставки решения до преподавателя.
 
+## Задание 09.03 Jenkins
+
+> 1. Основное задание:
+
+- Сделать Freestyle Job, который будет запускать ansible-playbook из форка репозитория
+- Сделать Declarative Pipeline, который будет выкачивать репозиторий с плейбукой и запускать её
+- Перенести Declarative Pipeline в репозиторий в файл Jenkinsfile
+- Перенастроить Job на использование Jenkinsfile из репозитория
+- Создать Scripted Pipeline, наполнить его скриптом из pipeline
+- Заменить credentialsId на свой собственный
+- Проверить работоспособность, исправить ошибки, исправленный Pipeline вложить в репозитрий в файл ScriptedJenkinsfile
+- Отправить ссылку на репозиторий в ответе
+
+Ответ:
+
+ScriptedJenkiknsfile
+```
+node("ansible_docker"){
+    stage("Git checkout"){
+        git credentialsId: 'vmkey', url: 'git@github.com:bysart/example-playbook.git'
+    }
+    stage("Check ssh key"){
+        secret_check=true
+    }
+    stage("Run playbook"){
+        if (secret_check){
+            sh 'ansible-galaxy install -r requirements.yml'
+            sh 'ansible-playbook -i inventory/prod.yml site.yml'
+        }
+        else{
+            echo 'no more keys'
+        }
+        
+    }
+}
+```
+requirements.yml
+```
+---
+  - src: https://github.com/geerlingguy/ansible-role-java.git
+    scm: git
+    name: geerlingguy.java
+```
+site.yml
+```
+---
+  - hosts: any
+    tasks:
+     - name: installing repo for Java 8 in Ubuntu
+       apt_repository: repo='ppa:openjdk-r/ppa'
+  - hosts: any
+    roles:
+      - role: geerlingguy.java
+        when: "ansible_os_family == 'Debian'"
+        java_packages:
+          - openjdk-8-jdk
+```
+
+
+
 ## Задание 09.02 CI\CD
 
 > 1. задание 1 - Знакомоство с SonarQube
