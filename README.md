@@ -6,6 +6,115 @@
 Здесь будут опубликованы некоторые ДЗ по курсу.
 Github - простой и удобный способ доставки решения до преподавателя.
 
+## Задание 09.05 Gitlab
+
+> 1. Основное задание 
+
+DevOps
+В репозитории содержится код проекта на python. Проект - RESTful API сервис. Ваша задача автоматизировать сборку образа с выполнением python-скрипта:
+
+- Образ собирается на основе centos:7
+- Python версии не ниже 3.7
+- Установлены зависимости: flask flask-jsonpify flask-restful
+- Создана директория /python_api
+- Скрипт из репозитория размещён в /python_api
+- Точка вызова: запуск скрипта
+- Если сборка происходит на ветке master: Образ должен пушится в docker registry вашего gitlab python-api:latest, иначе этот шаг нужно пропустить
+
+Product Owner
+Вашему проекту нужна бизнесовая доработка: необходимо поменять JSON ответа на вызов метода GET /rest/api/get_info, необходимо создать Issue в котором указать:
+
+- Какой метод необходимо исправить
+- Текст с { "message": "Already started" } на { "message": "Running"}
+- Issue поставить label: feature
+
+Developer
+Вам пришел новый Issue на доработку, вам необходимо:
+
+- Создать отдельную ветку, связанную с этим issue
+- Внести изменения по тексту из задания
+- Подготовить Merge Requst, влить необходимые изменения в master, проверить, что сборка прошла успешно
+
+Tester
+Разработчики выполнили новый Issue, необходимо проверить валидность изменений:
+
+- Поднять докер-контейнер с образом python-api:latest и проверить возврат метода на корректность
+- Закрыть Issue с комментарием об успешности прохождения, указав желаемый результат и фактически достигнутый
+
+Ответ:
+
+https://gitlab.com/net_gy/gitlab-0906
+
+.gitlab-ci.yml
+```
+variables:
+  tag: latest
+  regi: registry.gitlab.com/net_gy/gitlab-0906
+
+docker-build:
+  # Use the official docker image.
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  # Default branch leaves tag empty (= latest tag)
+  # All other branches are tagged with the escaped branch name (commit ref slug)
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        echo "Running on default branch '$CI_DEFAULT_BRANCH'"
+        docker build --pull -t  ${regi}/python-api:${tag} .
+        docker push ${regi}/python-api:${tag}
+      else
+        echo "Running on branch '$CI_COMMIT_BRANCH', will not be pushed"
+      fi
+  # Run this job in a branch where a Dockerfile exists
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - Dockerfile
+```
+
+Dockerfile
+```
+FROM centos:7
+
+RUN yum install -y python3 python3-pip
+
+RUN pip3 install flask flask-jsonpify flask-restful
+
+COPY python-api.py /opt/python-api/python-api.py
+
+CMD ["python3", "/opt/python-api/python-api.py"]
+
+```
+
+python-api.py
+```
+from flask import Flask, request
+from flask_restful import Resource, Api
+from json import dumps
+from flask_jsonpify import jsonify
+
+app = Flask(__name__)
+api = Api(app)
+
+class Info(Resource):
+    def get(self):
+        return {'version': 3, 'method': 'GET', 'message': 'Running'}
+
+api.add_resource(Info, '/rest/api/get_info')
+
+if __name__ == '__main__':
+     app.run(host='0.0.0.0', port='5290')
+```
+
+скрин:
+
+![img.png](screen/img_35.png)
+
 ## Задание 09.03 Jenkins
 
 > 1. Основное задание:
@@ -21,7 +130,7 @@ Github - простой и удобный способ доставки реше
 
 Ответ:
 
-ScriptedJenkiknsfile
+ScriptedJenkiknsfileq
 ```
 node("ansible_docker"){
     stage("Git checkout"){
