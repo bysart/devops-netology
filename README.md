@@ -6,6 +6,65 @@
 Здесь будут опубликованы некоторые ДЗ по курсу.
 Github - простой и удобный способ доставки решения до преподавателя.
 
+## Задание 7.3. Основы и принцип работы Терраформ
+
+> 1. Инициализируем проект и создаем воркспейсы. Выполните terraform init: если был создан бэкэнд в S3, то терраформ создат файл стейтов в S3 и запись в таблице dynamodb. иначе будет создан локальный файл со стейтами.
+Создайте два воркспейса stage и prod.
+В уже созданный aws_instance добавьте зависимость типа инстанса от вокспейса, что бы в разных ворскспейсах использовались разные instance_type.
+Добавим count. Для stage должен создаться один экземпляр ec2, а для prod два.
+Создайте рядом еще один aws_instance, но теперь определите их количество при помощи for_each, а не count.
+Что бы при изменении типа инстанса не возникло ситуации, когда не будет ни одного инстанса добавьте параметр жизненного цикла create_before_destroy = true в один из рессурсов aws_instance.
+При желании поэкспериментируйте с другими параметрами и рессурсами.
+В виде результата работы пришлите: Вывод команды terraform workspace list. Вывод команды terraform plan для воркспейса prod.
+
+Ответ:
+
+`terraform workspace list`
+
+![img.png](screen/img_37.png)
+
+Ссылка на файл:
+[main.tf](terraform/main.tf)
+
+`terraform plan` вывод результата большой, скрин ниже, в том числе прилагаю лог: [terraform-plan.log](terraform/terraform-plan.log)
+
+![img.png](screen/img_38.png)
+
+## Задание 7.2. Облачные провайдеры и синтаксис Terraform
+
+> 1. (Вариант с Yandex.Cloud). Регистрация в ЯО и знакомство с основами (необязательно, но крайне желательно). Создание aws ec2 или yandex_compute_instance через терраформ - yandex_compute_image, terraform plan выполняется без ошибок. При помощи какого инструмента (из разобранных на прошлом занятии) можно создать свой образ ami?
+
+Ответ:
+Применительно к YandexCloud - можно создавать образы при помощи packer.
+
+Ссылка на файл :
+[main.tf](terraform/main.tf)
+
+```
+terraform {
+  required_providers {
+    yandex = {
+      source = "yandex-cloud/yandex"
+    }
+  }
+  required_version =  ">= 0.13"
+}
+
+provider yandex {
+  token     = " "
+  cloud_id  = "b1gkgvmr9o8bsvjohk1b"
+  folder_id = "b1gvmrjec5nkml550njb"
+  zone      = "default-ru-central1-a"
+}
+
+resource yandex_compute_image ubu-img {
+  name          =  "ubuntu-20-04-lts-v20210908"
+  source_image  = "fd81hgrcv6lsnkremf32"
+}
+```
+
+![img.png](screen/img_36.png)
+
 ## Задание 09.05 Gitlab
 
 > 1. Основное задание 
