@@ -14,6 +14,124 @@ Github - простой и удобный способ доставки реше
 
 https://github.com/bysart/08-ansible-01-base
 
+## Задание 7.6. Написание собственных провайдеров для Terraform
+
+> Исходный код AWS провайдера склонировать от сюда: https://github.com/hashicorp/terraform-provider-aws.git. Просто найдите нужные ресурсы в исходном коде и ответы на вопросы станут понятны. 
+> 1. Найдите, где перечислены все доступные resource и data_source, приложите ссылку на эти строки в коде на гитхабе. 
+> 2. Для создания очереди сообщений SQS используется ресурс aws_sqs_queue у которого есть параметр name.
+> - С каким другим параметром конфликтует name? Приложите строчку кода, в которой это указано.
+> - Какая максимальная длина имени?
+> - Какому регулярному выражению должно подчиняться имя?
+
+Ответ:
+
+Колонирование репозитория:
+
+git clone https://github.com/hashicorp/terraform-provider-aws.git
+
+1. resource и data_source: 
+
+`ResourcesMap: map[string]*schema.Resource`
+  
+https://github.com/hashicorp/terraform-provider-aws/blob/8e4d8a3f3f781b83f96217c2275f541c893fec5a/aws/provider.go#L411
+
+`DataSourcesMap: map[string]*schema.Resource`
+  
+https://github.com/hashicorp/terraform-provider-aws/blob/8e4d8a3f3f781b83f96217c2275f541c893fec5a/aws/provider.go#L169
+
+2. - name конфликтует с: `ConflictsWith: []string{"name_prefix"}`
+    
+объявлено в `Schema: map[string]*schema.Schema` 
+    
+https://github.com/hashicorp/terraform-provider-aws/blob/8e4d8a3f3f781b83f96217c2275f541c893fec5a/aws/resource_aws_sqs_queue.go#L56  
+
+   - максимальная длинна имени: 80 символов
+    
+https://github.com/hashicorp/terraform-provider-aws/blob/8e4d8a3f3f781b83f96217c2275f541c893fec5a/aws/validators.go#L1038
+
+   - ограничения по регулярному выражению для имени: 
+
+`[0-9A-Za-z-_]` в том числе доп ограничения fifo, которые определены в `func validateSQSNonFifoQueueName` `func validateSQSFifoQueueName`.
+
+ https://github.com/hashicorp/terraform-provider-aws/blob/8e4d8a3f3f781b83f96217c2275f541c893fec5a/aws/validators.go#L1041
+
+## Задание 7.5. Основы golang
+
+> 1. Установите golang
+
+Ответ:
+
+![img.png](screen/img_39.png)
+
+> 2. Знакомство с gotour
+
+Ответ:
+https://go.dev/tour/list
+
+> 3. Написание кода
+
+>  - Напишите программу для перевода метров в футы (1 фут = 0.3048 метр). Можно запросить исходные данные у пользователя, а можно статически задать в коде. Для взаимодействия с пользователем можно использовать функцию Scanf
+
+```
+package main
+  import "fmt"
+  func main() {
+    var foot float64
+      fmt.Print("Type foot: ")
+      fmt.Scanf("%f", &foot)           
+      result := foot * 0.3048 
+      fmt.Println("Meters:", result )
+        }
+```
+```
+[sovar@fedora go]$ go run test.go
+Type foot: 7.7
+Meters: 2.34696
+```
+
+>  - Напишите программу, которая найдет наименьший элемент в любом заданном списке `x := []int{48,96,86,68,57,82,63,70,37,34,83,27,19,97,9,17,}`
+
+```
+package main
+  import "fmt"
+  func main() {
+    x := []int{48,2, 96,86,3,68,57,82,63,70,37,34,83,27,19,97,9,17,1}
+    zero := 0
+    for i, less := range x {
+      if (i == 0) {
+        zero = less
+      } else {
+        if (less < zero) {
+          zero = less
+        }
+      }
+      }
+    fmt.Println("Min integer: ", zero)
+  }
+```
+```
+[sovar@fedora go]$ go run test.go
+Min integer:  1
+```
+
+>  - Напишите программу, которая выводит числа от 1 до 100, которые делятся на 3. То есть (3, 6, 9, …)
+
+```
+ package main
+  import "fmt"
+   func main() {
+    for i := 1; i <= 100; i++ {
+      if (i%3) == 0 {
+        fmt.Print("[",i,"]")
+      }
+    }
+  }
+```
+```
+[sovar@fedora go]$ go run test.go
+[3][6][9][12][15][18][21][24][27][30][33][36][39][42][45][48][51][54][57][60][63][66][69][72][75][78][81][84][87][90][93][96][99]
+```
+
 ## Задание 7.3. Основы и принцип работы Терраформ
 
 > 1. Инициализируем проект и создаем воркспейсы. Выполните terraform init: если был создан бэкэнд в S3, то терраформ создат файл стейтов в S3 и запись в таблице dynamodb. иначе будет создан локальный файл со стейтами.
